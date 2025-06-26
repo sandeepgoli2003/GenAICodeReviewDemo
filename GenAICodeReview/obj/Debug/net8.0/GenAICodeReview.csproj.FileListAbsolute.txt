@@ -1,0 +1,15 @@
+C:\Users\sande\Desktop\gittest\GenAICodeReviewDemo\GenAICodeReview\obj\Debug\net8.0\GenAICodeReview.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\sande\Desktop\gittest\GenAICodeReviewDemo\GenAICodeReview\obj\Debug\net8.0\GenAICodeReview.AssemblyInfoInputs.cache
+C:\Users\sande\Desktop\gittest\GenAICodeReviewDemo\GenAICodeReview\obj\Debug\net8.0\GenAICodeReview.AssemblyInfo.cs
+C:\Users\sande\Desktop\gittest\GenAICodeReviewDemo\GenAICodeReview\obj\Debug\net8.0\GenAICodeReview.csproj.CoreCompileInputs.cache
+C:\Users\sande\Desktop\gittest\GenAICodeReviewDemo\GenAICodeReview\obj\Debug\net8.0\GenAICodeReview.sourcelink.json
+C:\Users\sande\Desktop\gittest\GenAICodeReviewDemo\GenAICodeReview\bin\Debug\net8.0\GenAICodeReview.exe
+C:\Users\sande\Desktop\gittest\GenAICodeReviewDemo\GenAICodeReview\bin\Debug\net8.0\GenAICodeReview.deps.json
+C:\Users\sande\Desktop\gittest\GenAICodeReviewDemo\GenAICodeReview\bin\Debug\net8.0\GenAICodeReview.runtimeconfig.json
+C:\Users\sande\Desktop\gittest\GenAICodeReviewDemo\GenAICodeReview\bin\Debug\net8.0\GenAICodeReview.dll
+C:\Users\sande\Desktop\gittest\GenAICodeReviewDemo\GenAICodeReview\bin\Debug\net8.0\GenAICodeReview.pdb
+C:\Users\sande\Desktop\gittest\GenAICodeReviewDemo\GenAICodeReview\obj\Debug\net8.0\GenAICodeReview.dll
+C:\Users\sande\Desktop\gittest\GenAICodeReviewDemo\GenAICodeReview\obj\Debug\net8.0\refint\GenAICodeReview.dll
+C:\Users\sande\Desktop\gittest\GenAICodeReviewDemo\GenAICodeReview\obj\Debug\net8.0\GenAICodeReview.pdb
+C:\Users\sande\Desktop\gittest\GenAICodeReviewDemo\GenAICodeReview\obj\Debug\net8.0\GenAICodeReview.genruntimeconfig.cache
+C:\Users\sande\Desktop\gittest\GenAICodeReviewDemo\GenAICodeReview\obj\Debug\net8.0\ref\GenAICodeReview.dll
