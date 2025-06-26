@@ -21,13 +21,19 @@ foreach (var comment in comments)
     await PostGitHubComment(owner, repo, prNumber, githubToken, comment);
 }
 
-string RunGitCommand(string cmd) => System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+string RunGitCommand(string cmd)
 {
-    FileName = "/bin/bash",
-    Arguments = $"-c \"{cmd}\"",
-    RedirectStandardOutput = true,
-    UseShellExecute = false
-})?.StandardOutput.ReadToEnd() ?? "";
+    var psi = new System.Diagnostics.ProcessStartInfo
+    {
+        FileName = "cmd.exe",
+        Arguments = $"/c {cmd}",
+        RedirectStandardOutput = true,
+        UseShellExecute = false,
+        CreateNoWindow = true
+    };
+    using var process = System.Diagnostics.Process.Start(psi);
+    return process?.StandardOutput.ReadToEnd() ?? "";
+}
 
 async Task<List<ReviewComment>> GetOpenAiReviewComments(string diffText)
 {
@@ -35,9 +41,9 @@ async Task<List<ReviewComment>> GetOpenAiReviewComments(string diffText)
 Review this GitHub PR diff and return suggestions in JSON:
 [
   {{
-    \"file\": \"filename.cs\",
-    \"line\": 15,
-    \"comment\": \"Consider renaming for clarity.\"
+    ""file"": ""filename.cs"",
+    ""line"": 15,
+    ""comment"": ""Consider renaming for clarity.""
   }}
 ]
 
