@@ -7,7 +7,6 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-
 string openAiApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY")!;
 string githubToken = Environment.GetEnvironmentVariable("GITHUB_TOKEN")!;
 string githubRef = Environment.GetEnvironmentVariable("GITHUB_REF")!;
@@ -26,19 +25,13 @@ foreach (var comment in comments)
     await PostGitHubComment(owner, repo, prNumber, githubToken, comment);
 }
 
-string RunGitCommand(string cmd)
+string RunGitCommand(string cmd) => System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
 {
-    var psi = new System.Diagnostics.ProcessStartInfo
-    {
-        FileName = "cmd.exe",
-        Arguments = $"/c {cmd}",
-        RedirectStandardOutput = true,
-        UseShellExecute = false,
-        CreateNoWindow = true
-    };
-    using var process = System.Diagnostics.Process.Start(psi);
-    return process?.StandardOutput.ReadToEnd() ?? "";
-}
+    FileName = "/bin/bash",
+    Arguments = $"-c \"{cmd}\"",
+    RedirectStandardOutput = true,
+    UseShellExecute = false
+})?.StandardOutput.ReadToEnd() ?? "";
 
 async Task<List<ReviewComment>> GetOpenAiReviewComments(string diffText)
 {
