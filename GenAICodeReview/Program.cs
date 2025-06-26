@@ -41,6 +41,49 @@ Review this GitHub PR diff and return suggestions in JSON:
   {{
     ""file"": ""filename.cs"",
     ""line"": 15,
+    ""comment"": ""Consider renaming this variable for clarity.""
+  }}
+]
+
+Diff:
+{diffText}";
+
+    using var http = new HttpClient();
+    http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", openAiApiKey);
+
+    var requestBody = new
+    {
+        model = "gpt-4",
+        messages = new[] { new { role = "user", content = prompt } },
+        temperature = 0.2
+    };
+
+    var response = await http.PostAsync("https://api.openai.com/v1/chat/completions",
+        new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json"));
+
+    var json = await response.Content.ReadAsStringAsync();
+
+    using var doc = JsonDocument.Parse(json);
+    if (!doc.RootElement.TryGetProperty("choices", out var choices))
+    {
+        Console.WriteLine("❌ Error from OpenAI:");
+        Console.WriteLine(json);
+        return new List<ReviewComment>();
+    }
+
+    var content = choices[0].GetProperty("message").GetProperty("content").GetString();
+    Console.WriteLine("✅ OpenAI Review Response:");
+    Console.WriteLine(content);
+
+    return JsonSerializer.Deserialize<List<ReviewComment>>(content!) ?? new List<ReviewComment>();
+}
+{
+    var prompt = @$"
+Review this GitHub PR diff and return suggestions in JSON:
+[
+  {{
+    ""file"": ""filename.cs"",
+    ""line"": 15,
     ""comment"": ""Consider renaming for clarity.""
   }}
 ]
