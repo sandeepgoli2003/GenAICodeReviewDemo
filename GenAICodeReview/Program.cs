@@ -77,39 +77,6 @@ Diff:
 
     return JsonSerializer.Deserialize<List<ReviewComment>>(content!) ?? new List<ReviewComment>();
 }
-{
-    var prompt = @$"
-Review this GitHub PR diff and return suggestions in JSON:
-[
-  {{
-    ""file"": ""filename.cs"",
-    ""line"": 15,
-    ""comment"": ""Consider renaming for clarity.""
-  }}
-]
-
-Diff:
-{diffText}";
-
-    using var http = new HttpClient();
-    http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", openAiApiKey);
-
-    var requestBody = new
-    {
-        model = "gpt-4",
-        messages = new[] { new { role = "user", content = prompt } },
-        temperature = 0.2
-    };
-
-    var response = await http.PostAsync("https://api.openai.com/v1/chat/completions",
-        new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json"));
-
-    var json = await response.Content.ReadAsStringAsync();
-    using var doc = JsonDocument.Parse(json);
-    var content = doc.RootElement.GetProperty("choices")[0].GetProperty("message").GetProperty("content").GetString();
-
-    return JsonSerializer.Deserialize<List<ReviewComment>>(content!) ?? new List<ReviewComment>();
-}
 
 async Task PostGitHubComment(string owner, string repo, string prNumber, string token, ReviewComment comment)
 {

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GenAICodeReview")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+72a371bfd413b61b8334920c825500e99e387d18")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+efd44939f8a96d0e0fa9331bdf66cdd911cb180d")]
 [assembly: System.Reflection.AssemblyProductAttribute("GenAICodeReview")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GenAICodeReview")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
