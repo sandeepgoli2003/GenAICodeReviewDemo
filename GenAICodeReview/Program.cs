@@ -1,8 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-
+using System.Threading.Tasks;
 string openAiApiKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY")!;
 string githubToken = Environment.GetEnvironmentVariable("GITHUB_TOKEN")!;
 string githubRef = Environment.GetEnvironmentVariable("GITHUB_REF")!;
@@ -13,7 +17,7 @@ string prNumber = githubRef.Split('/').Last();
 string diff = RunGitCommand("git fetch origin main && git diff origin/main...HEAD");
 
 Console.WriteLine("Fetching review from OpenAI...");
-var comments = await GetOpenAiReviewComments(diff);
+var comments = await GetClaudeReviewComments(diff);
 
 Console.WriteLine($"Posting {comments.Count} comments to PR...");
 foreach (var comment in comments)
@@ -28,6 +32,52 @@ string RunGitCommand(string cmd) => System.Diagnostics.Process.Start(new System.
     RedirectStandardOutput = true,
     UseShellExecute = false
 })?.StandardOutput.ReadToEnd() ?? "";
+async Task<List<ReviewComment>> GetClaudeReviewComments(string diffText)
+{
+    var prompt = @$"Review this GitHub PR diff and return improvement suggestions in JSON:
+[
+  {{
+    ""file"": ""filename.cs"",
+    ""line"": 12,
+    ""comment"": ""Consider renaming for clarity.""
+  }}
+]
+
+Diff:
+{diffText}";
+
+    using var http = new HttpClient();
+    http.DefaultRequestHeaders.Add("x-api-key", Environment.GetEnvironmentVariable("CLAUDE_API_KEY"));
+    http.DefaultRequestHeaders.Add("anthropic-version", "2023-06-01");
+
+    var requestBody = new
+    {
+        model = "claude-3-sonnet-20240229",
+        max_tokens = 1024,
+        messages = new[]
+        {
+            new { role = "user", content = prompt }
+        }
+    };
+
+    var response = await http.PostAsync("https://api.anthropic.com/v1/messages",
+        new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json"));
+
+    var json = await response.Content.ReadAsStringAsync();
+    using var doc = JsonDocument.Parse(json);
+
+    if (!doc.RootElement.TryGetProperty("content", out var contentElement))
+    {
+        Console.WriteLine("❌ Error from Claude:");
+        Console.WriteLine(json);
+        return new List<ReviewComment>();
+    }
+
+    var content = contentElement[0].GetProperty("text").GetString();
+    Console.WriteLine("✅ Claude Review Response:\n" + content);
+
+    return JsonSerializer.Deserialize<List<ReviewComment>>(content!) ?? new List<ReviewComment>();
+}
 
 async Task<List<ReviewComment>> GetOpenAiReviewComments(string diffText)
 {
@@ -35,9 +85,9 @@ async Task<List<ReviewComment>> GetOpenAiReviewComments(string diffText)
 Review this GitHub PR diff and return suggestions in JSON:
 [
   {{
-    \"file\": \"filename.cs\",
-    \"line\": 15,
-    \"comment\": \"Consider renaming for clarity.\"
+    ""file"": ""filename.cs"",
+    ""line"": 15,
+    ""comment"": ""Consider renaming this variable for clarity.""
   }}
 ]
 
@@ -49,7 +99,7 @@ Diff:
 
     var requestBody = new
     {
-        model = "gpt-4",
+        model = "gpt-3.5-turbo",
         messages = new[] { new { role = "user", content = prompt } },
         temperature = 0.2
     };
@@ -58,8 +108,18 @@ Diff:
         new StringContent(JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json"));
 
     var json = await response.Content.ReadAsStringAsync();
+
     using var doc = JsonDocument.Parse(json);
-    var content = doc.RootElement.GetProperty("choices")[0].GetProperty("message").GetProperty("content").GetString();
+    if (!doc.RootElement.TryGetProperty("choices", out var choices))
+    {
+        Console.WriteLine("❌ Error from OpenAI:");
+        Console.WriteLine(json);
+        return new List<ReviewComment>();
+    }
+
+    var content = choices[0].GetProperty("message").GetProperty("content").GetString();
+    Console.WriteLine("✅ OpenAI Review Response:");
+    Console.WriteLine(content);
 
     return JsonSerializer.Deserialize<List<ReviewComment>>(content!) ?? new List<ReviewComment>();
 }
